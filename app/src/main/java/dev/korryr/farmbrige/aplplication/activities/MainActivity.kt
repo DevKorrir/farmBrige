@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import dev.korryr.farmbrige.ui.features.auth.view.LoginScreen
+import dev.korryr.farmbrige.ui.features.auth.view.SignUpScreen
 import dev.korryr.farmbrige.ui.theme.FarmBrigeTheme
 
 
@@ -21,10 +22,9 @@ class MainActivity : ComponentActivity() {
                 Scaffold(
                     modifier = Modifier.fillMaxSize()
                 ) { innerPadding ->
-                    LoginScreen(
+                    SignUpScreen(
                         modifier = Modifier.padding(innerPadding)
                     )
-
                 }
             }
         }
