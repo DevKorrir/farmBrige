@@ -48,7 +48,10 @@ import dev.korryr.farmbrige.ui.SharedUi.SharedTextField
 
 @Composable
 fun LoginScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onClickLogin: () -> Unit = {},
+    onNavigateToSignUp: () -> Unit = {},
+    onClickGoogle: () -> Unit = {}
 ) {
 
     // state variables
@@ -233,7 +236,7 @@ fun LoginScreen(
                         modifier = Modifier
                             .height(56.dp)
                             .fillMaxWidth(),
-                        onClick = {},
+                        onClick = onClickLogin,
                         shape = RoundedCornerShape(16.dp),
                         contentPadding = PaddingValues(vertical = 16.dp),
                         colors = ButtonDefaults.buttonColors(
@@ -281,9 +284,7 @@ fun LoginScreen(
                     //social login
 
                     OutlinedButton(
-                        onClick = {
-                            //toast meassage
-                        },
+                        onClick = onClickGoogle,
                         shape = RoundedCornerShape(16.dp),
                         contentPadding = PaddingValues(vertical = 12.dp),
                         border = ButtonDefaults.outlinedButtonBorder.copy(
@@ -332,7 +333,7 @@ fun LoginScreen(
                         )
 
                         TextButton(
-                            onClick = {}
+                            onClick = onNavigateToSignUp,
 
                         ) {
                             Text(

@@ -8,8 +8,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
+import androidx.navigation.compose.rememberNavController
 import dev.korryr.farmbrige.ui.features.auth.view.LoginScreen
 import dev.korryr.farmbrige.ui.features.auth.view.SignUpScreen
+import dev.korryr.farmbrige.ui.navigation.NavGraph
 import dev.korryr.farmbrige.ui.theme.FarmBrigeTheme
 
 
@@ -18,12 +20,15 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            val navController = rememberNavController()
+
             FarmBrigeTheme {
                 Scaffold(
                     modifier = Modifier.fillMaxSize()
                 ) { innerPadding ->
-                    SignUpScreen(
-                        modifier = Modifier.padding(innerPadding)
+                    NavGraph(
+                        modifier = Modifier.padding(innerPadding),
+                        navController = navController
                     )
                 }
             }

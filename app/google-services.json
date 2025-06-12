@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "184365014628",
+    "project_id": "project-farmbridge",
+    "storage_bucket": "project-farmbridge.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:184365014628:android:bcf7ace7c5a2f89df40971",
+        "android_client_info": {
+          "package_name": "dev.korryr.farmbrige"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBIym6P8U-vLFovqCq5zvMZ8EdUv1E56pk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
