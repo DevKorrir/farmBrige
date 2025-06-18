@@ -20,6 +20,7 @@ fun NavGraph(
 ) {
     val context = LocalContext.current
     val startRoute = Screen.Login.route
+
     NavHost(
         navController = navController,
         startDestination = startRoute,
@@ -35,7 +36,8 @@ fun NavGraph(
                 },
                 onClickGoogle = {
                     Toast.makeText(context, "feature soon", Toast.LENGTH_SHORT).show()
-                }
+                },
+                navController = navController
             )
         }
 

@@ -13,4 +13,5 @@ interface AuthService {
         email: String,
         password: String
     ): Result<FirebaseUser>
+
 }
