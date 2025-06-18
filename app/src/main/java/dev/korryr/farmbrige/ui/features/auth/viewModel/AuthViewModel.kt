@@ -6,6 +6,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
+import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.korryr.farmbrige.ui.features.auth.repo.AuthRepository
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,6 +23,7 @@ sealed class AuthUiState {
     object PasswordResetSent : AuthUiState()
 }
 
+@HiltViewModel
 class AuthViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val auth: FirebaseAuth,
@@ -62,4 +64,25 @@ class AuthViewModel @Inject constructor(
         }
     }
 
+
+    fun Login(email: String, password: String) {
+        if (email.isBlank() && password.isBlank()) {
+            _authstate.value = AuthUiState.Error("Email and password cannot be empty")
+            return
+        }
+
+        viewModelScope.launch {
+            _authstate.value = AuthUiState.Loading
+            authRepository.login(email, password)
+                .fold(
+                    onSuccess = { user ->
+                        _authstate.value = AuthUiState.Success(user)
+                    },
+                    onFailure = {
+                        _authstate.value = AuthUiState.Error(it.message ?: "Unknown error")
+                    }
+                )
+
+        }
+    }
 }

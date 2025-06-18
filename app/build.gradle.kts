@@ -67,6 +67,7 @@ dependencies {
     kapt("com.google.dagger:hilt-android-compiler:2.56.2") // Annotation processor
     kapt("androidx.hilt:hilt-compiler:1.2.0") // Optional: for Hilt Compose integration
 
+    implementation ("androidx.hilt:hilt-navigation-compose:1.2.0")
     // Firebase (if using)
     implementation(platform("com.google.firebase:firebase-bom:33.15.0")) // Use latest BOM
     implementation("com.google.firebase:firebase-auth-ktx")
