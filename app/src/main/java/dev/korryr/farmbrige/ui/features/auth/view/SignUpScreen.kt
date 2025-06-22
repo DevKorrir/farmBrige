@@ -429,7 +429,7 @@ fun SignUpScreen(
                 alpha = 0.8f
             )
 
-            Spacer(Modifier.height(60.dp))
+            //Spacer(Modifier.height(60.dp)) here
         }
 
 
