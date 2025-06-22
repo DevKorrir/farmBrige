@@ -21,6 +21,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -83,6 +84,14 @@ fun LoginScreen(
     val context = LocalContext.current
     val authState by authViewModel.authState.collectAsState()
 
+    //error states
+    var showErrors by rememberSaveable { mutableStateOf(false) }
+    var emailError by rememberSaveable { mutableStateOf("") }
+    var passwordError by rememberSaveable { mutableStateOf("") }
+
+    //valididty states
+    var isFormValid by rememberSaveable { mutableStateOf(false) }
+
     LaunchedEffect(authState) {
         when (authState) {
             is AuthUiState.Success -> {
@@ -99,295 +108,355 @@ fun LoginScreen(
         }
     }
 
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(backgroundGradient)
+    ) {
         Box(
             modifier = Modifier
-                .fillMaxSize()
-                .background(backgroundGradient)
+                .fillMaxWidth()
+                .height(220.dp)
+                .clip(
+                    RoundedCornerShape(
+                        bottomEnd = 40.dp, bottomStart = 40.dp
+                    )
+                )
         ) {
+            Image(
+                painter = painterResource(id = R.drawable.cabbage_backgroud),
+                contentDescription = "Login Background",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+
             Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(220.dp)
-                    .clip(
-                        RoundedCornerShape(
-                            bottomEnd = 40.dp, bottomStart = 40.dp
+                    .fillMaxSize()
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(
+                                MaterialTheme.colorScheme.primary.copy(alpha = 0.6f),
+                                MaterialTheme.colorScheme.tertiary.copy(0.4f)
+                            )
                         )
                     )
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.cabbage_backgroud),
-                    contentDescription = "Login Background",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize()
-                )
+            )
 
+
+            // kalogo iconic
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
                 Box(
                     modifier = Modifier
-                        .fillMaxSize()
+                        .size(90.dp)
+                        .clip(CircleShape)
                         .background(
                             Brush.verticalGradient(
                                 colors = listOf(
                                     MaterialTheme.colorScheme.primary.copy(alpha = 0.6f),
-                                    MaterialTheme.colorScheme.tertiary.copy(0.4f)
+                                    MaterialTheme.colorScheme.tertiary.copy(alpha = 0.4f)
                                 )
                             )
                         )
-                )
+                        .padding(12.dp),
+                    contentAlignment = Alignment.Center
 
-
-                // kalogo iconic
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
                 ) {
-                    Box(
+                    Image(
+                        painter = painterResource(id = R.drawable.farmbrigelogo),
+                        contentDescription = "farm brige logo",
+                        contentScale = ContentScale.Crop,
                         modifier = Modifier
-                            .size(90.dp)
                             .clip(CircleShape)
-                            .background(
-                                Brush.verticalGradient(
-                                    colors = listOf(
-                                        MaterialTheme.colorScheme.primary.copy(alpha = 0.6f),
-                                        MaterialTheme.colorScheme.tertiary.copy(alpha = 0.4f)
-                                    )
-                                )
-                            )
-                            .padding(12.dp),
-                        contentAlignment = Alignment.Center
-
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.farmbrigelogo),
-                            contentDescription = "farm brige logo",
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .clip(CircleShape)
-                        )
-                    }
-
-                    Spacer(Modifier.height(16.dp))
-
-                    Text(
-                        text = "Welcome Back",
-                        style = MaterialTheme.typography.headlineLarge,
-                        color = Color.White
-                    )
-                    Text(
-                        text = "Sign in to continue",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = Color.White
                     )
                 }
+
+                Spacer(Modifier.height(16.dp))
+
+                Text(
+                    text = "Welcome Back",
+                    style = MaterialTheme.typography.headlineLarge,
+                    color = Color.White
+                )
+                Text(
+                    text = "Sign in to continue",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = Color.White
+                )
             }
+        }
 
 
 // main content here
-            Column(
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = 200.dp)
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // card for login
+            Surface(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(top = 200.dp)
-                    .verticalScroll(rememberScrollState()),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp, vertical = 16.dp),
+                shape = RoundedCornerShape(28.dp),
+                shadowElevation = 6.dp
             ) {
-                // card for login
-                Surface(
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 24.dp, vertical = 16.dp),
-                    shape = RoundedCornerShape(28.dp),
-                    shadowElevation = 6.dp
+                        .padding(horizontal = 24.dp, vertical = 28.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+
                 ) {
-                    Column(
+
+                    //email field
+                    SharedTextField(
+                        value = email,
+                        onValueChange = {
+                            email = it
+                            if (emailError.isNotEmpty()) emailError = "" //here
+                        },
+                        label = "Email",
+                        hint = "username123@gmail.com",// here
+                        error = emailError, //here
+                        leadingIcon = emailIcon,
+                        modifier = Modifier.fillMaxWidth(),
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Email,
+                            imeAction = ImeAction.Next
+                        ),
+                        maxLines = 1,
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    //password field
+                    SharedTextField(
+                        value = password,
+                        onValueChange = {
+                            password = it
+                           // if (passwordError.isNotEmpty()) passwordError = "" //here
+                        },
+                        label = "Password",
+                        error = if (showErrors) passwordError else "", //here
+                        leadingIcon = passwordIcon,
+                        isPassword = true,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Password,
+                            imeAction = ImeAction.Done
+                        ),
+                        onDone = {
+                            if (isFormValid) authViewModel.Login(email, password)
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        maxLines = 1,
+                    )
+
+                    Row(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 24.dp, vertical = 28.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        TextButton(
+                            onClick = {},
+                            contentPadding = PaddingValues(4.dp)
+                        ) {
+                            Text(
+                                text = "Forgot Password",
+                                color = MaterialTheme.colorScheme.primary,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Button(
+                        modifier = Modifier
+                            .height(56.dp)
+                            .fillMaxWidth(),
+                        onClick = {
+                            showErrors = true
+
+                            //validate on click
+                            var valid = true
+                            if (email.isEmpty()) {
+                                valid = false
+                                emailError = "Email is required"
+                            } else if (!isValidEmail(email)) {
+                                valid = false
+                                emailError = "Invalid email"
+                            } else {
+                                emailError = ""
+                            }
+
+
+                            if (password.isEmpty()) {
+                                valid = false
+                                passwordError = "Password is required"
+
+                            } else {
+                                passwordError = ""
+
+                            }
+
+                            isFormValid = valid
+                            if (isFormValid) authViewModel.Login(email, password)
+                        }, // did here
+                        enabled = authState !is AuthUiState.Loading, // did here
+                        shape = RoundedCornerShape(16.dp),
+                        contentPadding = PaddingValues(vertical = 16.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
+
+                        )
 
                     ) {
-
-                        SharedTextField(
-                            value = email,
-                            onValueChange = {
-                                email = it
-                            },
-                            label = "Email",
-                            hint = "kipyegom@gmail.com",
-                            leadingIcon = emailIcon,
-                            modifier = Modifier.fillMaxWidth(),
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Email,
-                                imeAction = ImeAction.Next
-                            ),
-                            maxLines = 1,
-                        )
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        SharedTextField(
-                            value = password,
-                            onValueChange = {
-                                password = it
-                            },
-                            label = "Password",
-                            leadingIcon = passwordIcon,
-                            isPassword = true,
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Password,
-                                imeAction = ImeAction.Done
-                            ),
-                            modifier = Modifier.fillMaxWidth(),
-                            maxLines = 1,
-                        )
-
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            horizontalArrangement = Arrangement.End
-                        ) {
-                            TextButton(
-                                onClick = {},
-                                contentPadding = PaddingValues(4.dp)
-                            ) {
-                                Text(
-                                    text = "Forgot Password",
-                                    color = MaterialTheme.colorScheme.primary,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        Button(
-                            modifier = Modifier
-                                .height(56.dp)
-                                .fillMaxWidth(),
-                            onClick = onClickLogin,
-                            shape = RoundedCornerShape(16.dp),
-                            contentPadding = PaddingValues(vertical = 16.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.primary,
-                                contentColor = MaterialTheme.colorScheme.onPrimary
-
+                        if (authState is AuthUiState.Loading) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(24.dp),
+                                color = MaterialTheme.colorScheme.onPrimary,
+                                strokeWidth = 2.dp
                             )
-
-                        ) {
+                        } else
                             Text(
                                 text = "Login",
                                 style = MaterialTheme.typography.titleMedium.copy(
                                     fontWeight = FontWeight.Bold
                                 )
                             )
-                        }
-
-                        Spacer(Modifier.height(24.dp))
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            HorizontalDivider(
-                                modifier = Modifier.weight(1f),
-                                color = MaterialTheme.colorScheme.outlineVariant
-                            )
-
-                            Text(
-                                text = "OR",
-                                modifier = Modifier
-                                    .padding(12.dp),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.outline
-                            )
-
-                            HorizontalDivider(
-                                modifier = Modifier.weight(1f),
-                                color = MaterialTheme.colorScheme.outlineVariant
-                            )
-                        }
-
-                        Spacer(Modifier.height(24.dp))
-
-                        //social login
-
-                        OutlinedButton(
-                            onClick = onClickGoogle,
-                            shape = RoundedCornerShape(16.dp),
-                            contentPadding = PaddingValues(vertical = 12.dp),
-                            border = ButtonDefaults.outlinedButtonBorder.copy(
-                                width = 1.5.dp
-                            ),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(56.dp)
-                        ) {
-                            Row {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.google),
-                                    contentDescription = "google",
-                                    tint = Color.Unspecified,
-                                    modifier = Modifier.size(24.dp)
-                                )
-
-                                Spacer(Modifier.size(12.dp))
-
-                                Text(
-                                    text = " Continue with google",
-                                    style = MaterialTheme.typography.titleMedium.copy(
-                                        fontWeight = FontWeight.Medium
-                                    ),
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
-
-
-                            }
-                        }
-
-                        Spacer(Modifier.height(12.dp))
-
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 16.dp),
-                            horizontalArrangement = Arrangement.Center,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-
-                            Text(
-                                text = "I don't have an account?",
-                                color = MaterialTheme.colorScheme.onSecondaryContainer,
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-
-                            TextButton(
-                                onClick = onNavigateToSignUp,
-
-                                ) {
-                                Text(
-                                    text = "Sign up",
-                                    color = MaterialTheme.colorScheme.primary,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
-                        }
-
-
+                            // did here
                     }
+
+                    //auth error here
+                    if (authState is AuthUiState.Error) {
+                        Spacer(Modifier.height(8.dp))
+                        Text(
+                            text = (authState as AuthUiState.Error).message,
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    } // did here
+
+                    Spacer(Modifier.height(24.dp))
+
+                    //or divider
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        HorizontalDivider(
+                            modifier = Modifier.weight(1f),
+                            color = MaterialTheme.colorScheme.outlineVariant
+                        )
+
+                        Text(
+                            text = "OR",
+                            modifier = Modifier
+                                .padding(12.dp),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.outline
+                        )
+
+                        HorizontalDivider(
+                            modifier = Modifier.weight(1f),
+                            color = MaterialTheme.colorScheme.outlineVariant
+                        )
+                    }
+
+                    Spacer(Modifier.height(24.dp))
+
+                    //social login
+
+                    OutlinedButton(
+                        onClick = onClickGoogle,
+                        shape = RoundedCornerShape(16.dp),
+                        contentPadding = PaddingValues(vertical = 12.dp),
+                        border = ButtonDefaults.outlinedButtonBorder.copy(
+                            width = 1.5.dp
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp)
+                    ) {
+                        Row {
+                            Icon(
+                                painter = painterResource(id = R.drawable.google),
+                                contentDescription = "google",
+                                tint = Color.Unspecified,
+                                modifier = Modifier.size(24.dp)
+                            )
+
+                            Spacer(Modifier.size(12.dp))
+
+                            Text(
+                                text = " Continue with google",
+                                style = MaterialTheme.typography.titleMedium.copy(
+                                    fontWeight = FontWeight.Medium
+                                ),
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+
+
+                        }
+                    }
+
+                    Spacer(Modifier.height(12.dp))
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 16.dp),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+
+                        Text(
+                            text = "I don't have an account?",
+                            color = MaterialTheme.colorScheme.onSecondaryContainer,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+
+                        TextButton(
+                            onClick = onNavigateToSignUp,
+
+                            ) {
+                            Text(
+                                text = "Sign up",
+                                color = MaterialTheme.colorScheme.primary,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+
+
                 }
-
-                Image(
-                    painter = painterResource(id = R.drawable.guava_footer),
-                    contentDescription = "Login Background",
-                    contentScale = ContentScale.FillWidth,
-                    modifier = Modifier
-                        .height(60.dp)
-                        .fillMaxWidth(),
-                    alpha = 0.8f
-                )
-
-                Spacer(Modifier.height(60.dp))
             }
+
+            Image(
+                painter = painterResource(id = R.drawable.guava_footer),
+                contentDescription = "Login Background",
+                contentScale = ContentScale.FillWidth,
+                modifier = Modifier
+                    .height(60.dp)
+                    .fillMaxWidth(),
+                alpha = 0.8f
+            )
+
+            //Spacer(Modifier.height(60.dp))
         }
     }
+}
+
+private fun isValidEmail(email: String): Boolean {
+    return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+}
