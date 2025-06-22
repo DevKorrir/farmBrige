@@ -21,6 +21,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -30,6 +31,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,15 +52,19 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import dev.korryr.farmbrige.R
 import dev.korryr.farmbrige.ui.SharedUi.SharedTextField
+import dev.korryr.farmbrige.ui.features.auth.viewModel.AuthUiState
+import dev.korryr.farmbrige.ui.features.auth.viewModel.AuthViewModel
 import org.jetbrains.annotations.Contract
 
 @Composable
 fun SignUpScreen(
     modifier: Modifier = Modifier,
     onNavigateToLogin: () -> Unit = {},
-    onSignedUp: (uid: String) -> Unit = {}
+    onSignedUp: (uid: String) -> Unit = {},
+    authViewModel: AuthViewModel = hiltViewModel()// did here
 ) {
 
     // state variables
@@ -89,13 +95,13 @@ fun SignUpScreen(
         )
     )
 
-//    val authState by viewModel.authState.collectAsState()
-//
-//    LaunchedEffect(authState) {
-//        if (authState is AuthUiState.Success) {
-//            onSignedUp((authState as AuthUiState.Success).user.uid)
-//        }
-//    }
+    val authState by authViewModel.authState.collectAsState()
+
+    LaunchedEffect(authState) {
+        if (authState is AuthUiState.Success) {
+            onSignedUp((authState as AuthUiState.Success).user.uid)
+        }
+    }// did here
 
     Box(
         modifier = Modifier
@@ -313,8 +319,9 @@ fun SignUpScreen(
                                 { confirmErr -> confirmPasswordError = confirmErr },
                                 { valid -> isFormValid = valid }
                             )
-                            if (isFormValid) onNavigateToLogin else ""
+                            if (isFormValid) authViewModel.signUp(email, password, userName)// here
                         },
+                        enabled = authState !is AuthUiState.Loading, // did here
                         shape = RoundedCornerShape(16.dp),
                         contentPadding = PaddingValues(vertical = 16.dp),
                         colors = ButtonDefaults.buttonColors(
@@ -324,15 +331,36 @@ fun SignUpScreen(
                         )
 
                     ) {
-                        Text(
-                            text = "Register",
-                            style = MaterialTheme.typography.titleMedium.copy(
-                                fontWeight = FontWeight.Bold
+
+                        if (authState is AuthUiState.Loading) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(24.dp),
+                                color = MaterialTheme.colorScheme.onPrimary,
+                                strokeWidth = 2.dp
                             )
-                        )
+                        } else {
+                            Text(
+                                text = "Register",
+                                style = MaterialTheme.typography.titleMedium.copy(
+                                    fontWeight = FontWeight.Bold
+                                )
+                            )
+                        } // did here
                     }
 
-                    //Spacer(Modifier.height(16.dp))
+                    if ( authState is AuthUiState.Error) {
+
+                        Spacer(Modifier.height(8.dp))
+
+                        Text(
+                            text = (authState as AuthUiState.Error).message,
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+
+                    } // did here
+
+                    Spacer(Modifier.height(16.dp))
 
                     // already have an account
                     Row(
