@@ -77,4 +77,8 @@ dependencies {
 
     // Coroutines for Firebase Tasks (important for suspending Firebase calls)
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.10.1")
+
+    //preference
+    implementation("androidx.datastore:datastore-preferences:1.1.7")
+
 }
