@@ -7,6 +7,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dev.korryr.farmbrige.ui.features.auth.preference.AuthPreferenceRepo
 import dev.korryr.farmbrige.ui.features.auth.repo.AuthRepository
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,7 +28,8 @@ sealed class AuthUiState {
 class AuthViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val auth: FirebaseAuth,
-    private val firestore: FirebaseFirestore
+    private val firestore: FirebaseFirestore,
+    private val authPreferenceRepo: AuthPreferenceRepo // did here
 ) : ViewModel() {
 
     private val _authstate = MutableStateFlow<AuthUiState>(AuthUiState.Idle)
@@ -65,7 +67,7 @@ class AuthViewModel @Inject constructor(
     }
 
 
-    fun Login(email: String, password: String) {
+    fun login(email: String, password: String) {
         if (email.isBlank() && password.isBlank()) {
             _authstate.value = AuthUiState.Error("Email and password cannot be empty")
             return
@@ -76,6 +78,9 @@ class AuthViewModel @Inject constructor(
             authRepository.login(email, password)
                 .fold(
                     onSuccess = { user ->
+                        //persits session
+                        authPreferenceRepo.setLoggedIn(user.uid) // did here
+
                         _authstate.value = AuthUiState.Success(user)
                     },
                     onFailure = {

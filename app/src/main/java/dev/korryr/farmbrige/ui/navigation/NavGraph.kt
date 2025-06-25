@@ -11,6 +11,9 @@ import androidx.navigation.compose.composable
 import dev.korryr.farmbrige.ui.features.auth.view.SignUpScreen
 import dev.korryr.farmbrige.ui.features.home.view.HomeScreen
 import android.widget.Toast
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import dev.korryr.farmbrige.ui.features.auth.preference.AuthPreferenceRepo
 
 @Composable
 fun NavGraph(
@@ -19,7 +22,13 @@ fun NavGraph(
 
 ) {
     val context = LocalContext.current
-    val startRoute = Screen.Login.route
+
+    val authPreferenceRepo = AuthPreferenceRepo(context) // did here
+    val isLoggedIn by authPreferenceRepo.isLoggedIn.collectAsState(false) // here
+    val startRoute = when {
+        isLoggedIn -> Screen.Home.route
+        else -> Screen.Login.route
+    }
 
     NavHost(
         navController = navController,

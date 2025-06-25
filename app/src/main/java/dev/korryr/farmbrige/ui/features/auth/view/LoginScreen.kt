@@ -254,7 +254,7 @@ fun LoginScreen(
                             imeAction = ImeAction.Done
                         ),
                         onDone = {
-                            if (isFormValid) authViewModel.Login(email, password)
+                            if (isFormValid) authViewModel.login(email, password)
                         },
                         modifier = Modifier.fillMaxWidth(),
                         maxLines = 1,
@@ -309,7 +309,7 @@ fun LoginScreen(
                             }
 
                             isFormValid = valid
-                            if (isFormValid) authViewModel.Login(email, password)
+                            if (isFormValid) authViewModel.login(email, password)
                         }, // did here
                         enabled = authState !is AuthUiState.Loading, // did here
                         shape = RoundedCornerShape(16.dp),
