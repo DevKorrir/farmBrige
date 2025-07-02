@@ -1,10 +1,7 @@
 package dev.korryr.farmbrige.ui.features.home.view
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,39 +21,48 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.ui.res.painterResource
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.firebase.auth.FirebaseAuth
-import java.util.Calendar
 import dev.korryr.farmbrige.R
+import dev.korryr.farmbrige.ui.features.auth.viewModel.AuthViewModel
+import dev.korryr.farmbrige.ui.features.home.model.DashboardItem
 import dev.korryr.farmbrige.ui.features.home.model.TaskItem
+import dev.korryr.farmbrige.ui.features.home.presentation.CategoryChip
+import dev.korryr.farmbrige.ui.features.home.presentation.DashboardItemCard
 import dev.korryr.farmbrige.ui.features.home.presentation.TaskItemCard
+import java.util.Calendar
 
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
+    authViewModel: AuthViewModel = hiltViewModel()
     //dashboardItems: List<DashboardItem> = emptyList(),
     //taskItems: List<TaskItem> = emptyList(),
 
@@ -67,7 +73,12 @@ fun HomeScreen(
     val userName = user?.displayName ?: "Guest"
 
     val dashboardItems: List<DashboardItem> = listOf(
-        DashboardItem("Crop Status", "75%", Color(0xFF9CCC65), "All crops growing well"),
+        DashboardItem(
+            title = "Crop Status",
+            "75%",
+            Color(0xFF9CCC65),
+            "All crops growing well"
+        ),
         DashboardItem("Weather", "Sunny", Color(0xFFFFB74D), "30°C, Light breeze"),
         DashboardItem("Water Usage", "65%", Color(0xFF4FC3F7), "Efficiency improved by 10%"),
         DashboardItem("Harvest", "2 Days", Color(0xFFBA68C8), "Tomatoes ready soon")
@@ -279,93 +290,27 @@ fun HomeScreen(
             modifier = Modifier.padding(top = 20.dp, bottom = 12.dp)
         )
 
-
-
-    }
-}
-
-@Composable
-fun CategoryChip(
-    label: String,
-    onClick: () -> Unit
-) {
-    Surface(
-        tonalElevation = 2.dp,
-        color = MaterialTheme.colorScheme.primaryContainer,
-        shape = RoundedCornerShape(16.dp),
-        modifier = Modifier
-            .clickable(onClick = onClick)
-    ) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
-        )
-    }
-}
-
-data class DashboardItem(
-    val title: String,
-    val value: String,
-    val color: Color,
-    val description: String
-)
-
-@Composable
-fun DashboardItemCard(item: DashboardItem) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(100.dp),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
-        elevation = CardDefaults.cardElevation(2.dp)
-    ) {
-        Column(
+        Button(
+            onClick = {
+                authViewModel.logout()
+            },
             modifier = Modifier
-                .fillMaxSize()
-                .padding(12.dp),
-            verticalArrangement = Arrangement.SpaceBetween
+                .fillMaxWidth()
+                .height(50.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.onErrorContainer,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            )
         ) {
-            // Title row with colored indicator
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(8.dp)
-                        .background(item.color, CircleShape)
-                )
-
-                Spacer(modifier = Modifier.width(6.dp))
-
-                Text(
-                    text = item.title,
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Medium,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
-
-            // Value with large text
-            Text(
-                text = item.value,
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                color = item.color
-            )
-
-            // Description
-            Text(
-                text = item.description,
-                style = MaterialTheme.typography.bodySmall,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-            )
+            Text(text = "LOGOUT")
         }
+
+
+
     }
 }
+
+
+
+
+

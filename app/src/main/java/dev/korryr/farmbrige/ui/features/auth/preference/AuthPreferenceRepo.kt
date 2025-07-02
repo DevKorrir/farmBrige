@@ -50,13 +50,13 @@ class AuthPreferenceRepo @Inject constructor ( context: Context) {
      *   • null       = still loading from disk
      *   • true/false = real value once DataStore loads
      */
-    val isLoggedInState: StateFlow<Boolean?> =
-        dataStore.data
-            .map { prefs -> prefs[KEY_LOGGED_iN] }     // returns Boolean? (null if not set)
-            .stateIn(
-                scope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
-                started = SharingStarted.Lazily,
-                initialValue = null
-            )
+//    val isLoggedInState: StateFlow<Boolean?> =
+//        dataStore.data
+//            .map { prefs -> prefs[KEY_LOGGED_iN] }     // returns Boolean? (null if not set)
+//            .stateIn(
+//                scope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
+//                started = SharingStarted.Lazily,
+//                initialValue = null
+//            )
 
 } //did here
