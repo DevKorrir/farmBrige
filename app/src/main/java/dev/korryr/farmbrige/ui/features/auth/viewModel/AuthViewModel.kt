@@ -90,4 +90,15 @@ class AuthViewModel @Inject constructor(
 
         }
     }
+
+    fun logout() {
+        viewModelScope.launch {
+            authPreferenceRepo.setLoggedOut() // did here
+        }
+        auth.signOut() //for firebase
+        _authstate.value = AuthUiState.Idle
+
+    }
+
+
 }
