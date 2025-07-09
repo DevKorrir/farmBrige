@@ -81,4 +81,11 @@ dependencies {
     //preference
     implementation("androidx.datastore:datastore-preferences:1.1.7")
 
+    //extend icons
+    implementation("androidx.compose.material:material-icons-core:1.7.8")
+    implementation("androidx.compose.material:material-icons-extended:1.7.8")
+
+    // animation
+    implementation("androidx.compose.animation:animation:1.8.3")
+
 }
