@@ -26,7 +26,6 @@ class FirebaseAuthImpl (
             else Result.failure(Throwable("User login failed"))
         } catch (e: Exception) {
             Result.failure(e)
-
         }
 
     }

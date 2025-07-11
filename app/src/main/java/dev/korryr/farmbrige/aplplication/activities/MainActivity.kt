@@ -24,14 +24,14 @@ class MainActivity : ComponentActivity() {
             val navController = rememberNavController()
 
             FarmBrigeTheme {
-                Scaffold(
-                    modifier = Modifier.fillMaxSize()
-                ) { innerPadding ->
+//                Scaffold(
+//                    modifier = Modifier.fillMaxSize()
+//                ) { innerPadding ->
                     NavGraph(
-                        modifier = Modifier.padding(innerPadding),
+                        modifier = Modifier,
                         navController = navController
                     )
-                }
+                //}
             }
         }
     }

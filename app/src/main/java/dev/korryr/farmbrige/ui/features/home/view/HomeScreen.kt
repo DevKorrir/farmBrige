@@ -1,5 +1,14 @@
 package dev.korryr.farmbrige.ui.features.home.view
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.EaseInCubic
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -34,6 +43,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -66,7 +76,7 @@ fun HomeScreen(
     //dashboardItems: List<DashboardItem> = emptyList(),
     //taskItems: List<TaskItem> = emptyList(),
 
-    ) {
+) {
 
     val auth = FirebaseAuth.getInstance()
     val user = auth.currentUser
@@ -91,222 +101,240 @@ fun HomeScreen(
         TaskItem("Check irrigation system", "Today", false),
         TaskItem("Harvest corn", "3 days", false)
     )
+    var visible by remember { mutableStateOf(false) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                MaterialTheme.colorScheme.background
+    LaunchedEffect(Unit) {
+        visible = true
+    }
+
+    AnimatedVisibility(
+        visible = visible,
+        enter = fadeIn() + slideInVertically(
+            initialOffsetY = { -40 },
+            animationSpec = spring(
+                dampingRatio = Spring.DampingRatioMediumBouncy,
+                stiffness = Spring.StiffnessLow
             )
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp)
-
+        )
     ) {
+
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    MaterialTheme.colorScheme.background
+                )
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp)
+
+        ) {
 //        Text(
 //            text = "Home Screen",
 //            modifier = modifier
 //        )
-        var query by remember { mutableStateOf("") }
+            var query by remember { mutableStateOf("") }
 
-        Surface(
-            shape = RoundedCornerShape(24.dp),
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(1.dp)
-        ) {
-            Row(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                verticalAlignment = Alignment.CenterVertically
-
+            Surface(
+                shape = RoundedCornerShape(24.dp),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(1.dp)
             ) {
-                Icon(
-                    Icons.Default.Search,
-                    contentDescription = "Search",
+                Row(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+
+                ) {
+                    Icon(
+                        Icons.Default.Search,
+                        contentDescription = "Search",
+                    )
+
+                    Spacer(Modifier.width(8.dp))
+
+                    BasicTextField(
+                        value = query,
+                        onValueChange = { query = it },
+                        singleLine = true,
+                        //modifier = Modifier.weight(1f),
+                        textStyle = MaterialTheme.typography.bodyMedium,
+                        keyboardOptions = KeyboardOptions(
+                            capitalization = KeyboardCapitalization.Sentences,
+                            imeAction = ImeAction.Search,
+                            keyboardType = KeyboardType.Text
+                        ),
+                        decorationBox = { innerTextField ->
+                            if (query.isEmpty()) {
+                                Text(
+                                    text = "Search products, tasks…",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                                )
+                                innerTextField()
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                }
+            }
+
+            Spacer(Modifier.height(16.dp))
+
+            // category  chip
+            val categories = listOf(
+                "seeds",
+                "Fertilizers",
+                "liveStock",
+                "liveStock2",
+                "liveStock3",
+                "liveStock4",
+
                 )
 
-                Spacer(Modifier.width(8.dp))
-
-                BasicTextField(
-                    value = query,
-                    onValueChange = { query = it },
-                    singleLine = true,
-                    //modifier = Modifier.weight(1f),
-                    textStyle = MaterialTheme.typography.bodyMedium,
-                    keyboardOptions = KeyboardOptions(
-                        capitalization = KeyboardCapitalization.Sentences,
-                        imeAction = ImeAction.Search,
-                        keyboardType = KeyboardType.Text
-                    ),
-                    decorationBox = { innerTextField ->
-                        if (query.isEmpty()) {
-                            Text(
-                                text = "Search products, tasks…",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
-                            )
-                            innerTextField()
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                )
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(categories) { category ->
+                    CategoryChip(
+                        label = category
+                    ) { }
+                }
 
             }
-        }
 
-        Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(16.dp))
 
-        // category  chip
-        val categories = listOf(
-            "seeds",
-            "Fertilizers",
-            "liveStock",
-            "liveStock2",
-            "liveStock3",
-            "liveStock4",
-
-        )
-
-        LazyRow (
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ){
-            items(categories) { category ->
-                CategoryChip(
-                    label = category
-                ) { }
-            }
-
-        }
-
-        Spacer(Modifier.height(16.dp))
-
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 12.dp),
-            shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer.copy(0.7f)
-            )
-        ){
-            val currentTime = Calendar.getInstance().get(Calendar.HOUR_OF_DAY) //same as modulus 24
-            val greeting = when (currentTime) {
-                in 3 .. 11 -> "Good Morning🌞"
-                in 12 .. 16 -> "Good Afternoon☀"
-                in 17 .. 20 -> "Good Evening"
-                else -> "Good Night"
-            }
-
-            Row (
+            Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
-            ){
-                Column (
-                    modifier = Modifier.weight(1f)
-                ){
-                    Text(
-                        text = greeting,
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-
-                    Text(
-                        text = userName,
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    Text(
-                        text = "Perfect day for farming! Your crops are doing well.",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
-                    )
+                    .padding(vertical = 12.dp),
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer.copy(0.7f)
+                )
+            ) {
+                val currentTime =
+                    Calendar.getInstance().get(Calendar.HOUR_OF_DAY) //same as modulus 24
+                val greeting = when (currentTime) {
+                    in 3..11 -> "Good Morning🌞"
+                    in 12..16 -> "Good Afternoon☀"
+                    in 17..20 -> "Good Evening"
+                    else -> "Good Night"
                 }
 
-                Box(
+                Row(
                     modifier = Modifier
-                        .size(60.dp)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.primaryContainer)
-                        .padding(8.dp),
-                    contentAlignment = Alignment.Center
+                        .fillMaxWidth()
+                        .padding(16.dp)
                 ) {
-                    //wether icon
-                    Icon(
-                        painter = painterResource(id = R.drawable.sun),
-                        contentDescription = "Sun",
-                        tint = MaterialTheme.colorScheme.secondary,
-                        modifier = Modifier.size(40.dp)
+                    Column(
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(
+                            text = greeting,
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
 
-                    )
+                        Text(
+                            text = userName,
+                            style = MaterialTheme.typography.headlineSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
 
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Text(
+                            text = "Perfect day for farming! Your crops are doing well.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
+                        )
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .size(60.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.primaryContainer)
+                            .padding(8.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        //wether icon
+                        Icon(
+                            painter = painterResource(id = R.drawable.sun),
+                            contentDescription = "Sun",
+                            tint = MaterialTheme.colorScheme.secondary,
+                            modifier = Modifier.size(40.dp)
+
+                        )
+
+                    }
                 }
             }
-        }
 
-        //farm dash board
-        Text(
-            text = "Farm Dashboard",
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onBackground,
-            modifier = Modifier.padding(vertical = 12.dp)
-        )
-
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(210.dp)
-        ) {
-            items(dashboardItems) { item ->
-                DashboardItemCard(item)
-            }
-        }
-
-        // Task section
-        Text(
-            text = "Today's Tasks",
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(top = 20.dp, bottom = 12.dp)
-        )
-
-        taskItems.forEach { task ->
-            TaskItemCard(task)
-            Spacer(modifier = Modifier.height(8.dp))
-        }
-
-        // Tips section
-        Text(
-            text = "Farming Tips",
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(top = 20.dp, bottom = 12.dp)
-        )
-
-        Button(
-            onClick = {
-                authViewModel.logout()
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.onErrorContainer,
-                contentColor = MaterialTheme.colorScheme.onPrimary
+            //farm dash board
+            Text(
+                text = "Farm Dashboard",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onBackground,
+                modifier = Modifier.padding(vertical = 12.dp)
             )
-        ) {
-            Text(text = "LOGOUT")
+
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(210.dp)
+            ) {
+                items(dashboardItems) { item ->
+                    DashboardItemCard(item)
+                }
+            }
+
+            // Task section
+            Text(
+                text = "Today's Tasks",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(top = 20.dp, bottom = 12.dp)
+            )
+
+            taskItems.forEach { task ->
+                TaskItemCard(task)
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+
+            // Tips section
+            Text(
+                text = "Farming Tips",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(top = 20.dp, bottom = 12.dp)
+            )
+
+            Button(
+                onClick = {
+                    authViewModel.logout()
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.onErrorContainer,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                )
+            ) {
+                Text(text = "LOGOUT")
+            }
+
+
         }
-
-
-
     }
 }
 
